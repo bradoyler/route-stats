@@ -1,6 +1,6 @@
 {
   "name": "route-stats",
-  "version": “0.0.1",
+  "version": "0.0.1",
   "description": "Simple way to monitor http requests across your Express app",
   "main": "index.js",
   "scripts": {
