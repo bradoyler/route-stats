@@ -40,8 +40,8 @@ module.exports.show = function show() {
           ["hgetall", "stats:all"],
           ["hgetall", "stats:hosts"]
       ]).exec(function (err, replies) {
-          console.log(replies);
-          res.send(replies[0]);
+          res.stats = replies;
+          next();
       });
     }
     else {

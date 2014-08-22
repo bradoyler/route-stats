@@ -15,7 +15,9 @@ describe('# Route Stats middleware test', function(){
      res.send('Hello ' + testindex);
   });
 
-  app.get('/stats', routeStats.show());
+  app.get('/stats', routeStats.show(), function (req, res) {
+    res.send(res.stats[0]);
+  });
 
   var agent = request.agent(app);
 
