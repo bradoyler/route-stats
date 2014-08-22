@@ -7,6 +7,12 @@ npm test
 ```
 
 ## How to use
+- Get a connection string to Redis (redistogo)
+
+```sh
+export REDIS_ENDPOINT=redis://redistogo:xxpasswordxxx@xyz.redistogo.com:10507/
+```
+
 ```js
 
 var routeStats = require('route-stats');
@@ -14,7 +20,7 @@ var routeStats = require('route-stats');
 // logs stats and reset every 60 seconds
 app.use(routeStats.logFor(60));
 
-// display stats
+// add route to display stats
 app.get('/stats', routeStats.show(), function(req, res){
 	res.send(res.stats);
 });

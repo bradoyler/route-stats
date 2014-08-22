@@ -8,6 +8,11 @@ var request = require('supertest'),
  var testindex = 0;
  var homeindex = 0;
 
+ if (!process.env.REDIS_ENDPOINT) {
+   console.warn('No process.env.REDIS_ENDPOINT set, could not connect');
+   return;
+ }
+
 describe('# Route Stats middleware test', function(){
   var app = express();
   app.use(routeStats.logFor(3));
