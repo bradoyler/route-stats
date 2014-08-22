@@ -1,4 +1,5 @@
 var redis  = require('redis-url');
+var pjson = require('./package.json');
 var rClient = null;
 
 if (!!process.env.REDIS_ENDPOINT) {
@@ -10,13 +11,21 @@ if (!!process.env.REDIS_ENDPOINT) {
     console.info('REDIS: Connected at ' + process.env.REDIS_ENDPOINT);
   });
 }
+else {
+  console.warn('No process.env.REDIS_ENDPOINT set, could not connect');
+}
 
 module.exports.logFor = function logFor(ttl) {
   return function(req, res, next) {
     var ua = req.headers['user-agent'] || '';
+    var host = req.headers.host || '';
+
     if(rClient) {
-      rClient.hincrby('sitestats', req.url, 1);
-      rClient.expire('sitestats', ttl);
+      rClient.hincrby('stats:all', req.url, 1);
+      rClient.expire('stats:all', ttl);
+      rClient.hincrby('stats:hosts', host, 1);
+      rClient.hset('stats:hosts', 'version', pjson.version);
+      rClient.expire('stats:hosts', ttl);
     }
     next();
   };
@@ -24,11 +33,15 @@ module.exports.logFor = function logFor(ttl) {
 };
 
 module.exports.show = function show() {
-//  type = type ||'';
+
   return function(req, res, next){
     if(rClient) {
-      rClient.hgetall('sitestats', function(err, replies) {
-          res.send(replies);
+      rClient.multi([
+          ["hgetall", "stats:all"],
+          ["hgetall", "stats:hosts"]
+      ]).exec(function (err, replies) {
+          console.log(replies);
+          res.send(replies[0]);
       });
     }
     else {
