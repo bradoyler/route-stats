@@ -6,42 +6,50 @@ var request = require('supertest'),
 
  var app = express();
  var testindex = 0;
+ var homeindex = 0;
 
 describe('# Route Stats middleware test', function(){
   var app = express();
+  app.use(routeStats.logFor(3));
 
-  app.get('/hello', routeStats.logFor(3), function(req, res){
-  	 testindex++;
-     res.send('Hello ' + testindex);
+  app.get('/home', function(req, res){
+  	 homeindex++;
+     res.send('home ' + homeindex);
+  });
+
+  app.get('/test', function(req, res){
+     testindex++;
+     res.send('test ' + testindex);
   });
 
   app.get('/stats', routeStats.show(), function (req, res) {
+    console.log(res.stats);
     res.send(res.stats[0]);
   });
 
   var agent = request.agent(app);
 
-  it('GET #1: Hello 1', function(done){
+  it('GET #1: Home 1', function(done){
     agent
-    .get('/hello')
-    .expect('Hello 1', done);
+    .get('/home')
+    .expect('home 1', done);
   });
 
-  it('GET #2: Hello 2', function(done){
+  it('GET #3: Home 2', function(done){
     agent
-    .get('/hello')
-    .expect('Hello 2', done);
+    .get('/home')
+    .expect('home 2', done);
   });
 
-  it('GET #3: Hello 3', function(done){
+  it('GET #2: Test 1', function(done){
     agent
-    .get('/hello')
-    .expect('Hello 3', done);
+    .get('/test')
+    .expect('test 1', done);
   });
 
   it('GET stats', function(done){
       agent
 	    .get('/stats')
-	    .expect('{"/hello":"3"}', done);
+	    .expect('{"/home":"2","/test":"1","/stats":"1"}', done);
   });
 });
